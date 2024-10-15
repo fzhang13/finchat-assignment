@@ -51,5 +51,6 @@ Trying to build a smart summarizer that can take the user input and translate in
 - Better error handling when company cannot be parsed in FMP (private companies)
 - Use a model that has more context into financially related stuff instead of a generic model
 - Fine tune models to be better suited for financial understanding
-- Use of Vector DB/Store to store queries/similar context as to stop requesting the API query each time
+- Use of Vector DB/Store to store queries/similar context as to stop requesting the API query each time and increase performance
+- General efficiency/performance improvements
 - More complex analysis through various FMP APIs or a combination of FMP APIs and backfed through OpenAI or other AI APIS/models
