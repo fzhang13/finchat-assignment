@@ -1,115 +1,107 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import { useState } from "react";
+import CompanyCard from "@/components/CompanyCard";
+import { CompanyProfile } from "@/data/types";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+type CompanyData = {
+  companyProfile: [];
+  earningsSummary: string;
+  earningsTranscript: [];
+  tickerSymbol: string;
+  summary: string;
+};
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [query, setQuery] = useState("");
+  const [summary, setSummary] = useState("");
+  const [earnings, setEarnings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/summary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const data = await response.json();
+
+      if (data.message) {
+        setError(data.message);
+        setSummary(data.summary);
+      }
+
+      const companyData = data.searchResult.map((result: CompanyData) => ({
+        companyProfile: result.companyProfile,
+        earningsSummary: result.earningsSummary,
+        earningsTranscript: result.earningsTranscript,
+        tickerSymbol: result.tickerSymbol,
+        summary: result.summary,
+      }));
+
+      setSummary(`Summary from OpenAI: ${data.summary}`);
+      setEarnings(companyData);
+      setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setError("An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>Company Earnings Summarizer</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Enter a financial question about a company:
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            required
+            style={{ width: "300px", margin: "10px", color: "black" }}
+          />
+        </label>
+        <button type="submit" disabled={loading}>
+          {loading ? "Processing..." : "Submit"}
+        </button>
+      </form>
+
+      {summary && (
+        <div style={{ marginTop: "20px" }}>
+          <h2>Summary</h2>
+          <p>{summary}</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      {earnings.length > 0 && (
+        <div style={{ marginTop: "20px" }}>
+          <h2>Company Profile</h2>
+          {earnings.map((earning: CompanyData, index) => (
+            <div key={index} style={{ marginBottom: "20px" }}>
+              {earning.companyProfile.map((company: CompanyProfile, index) => (
+                <CompanyCard key={index} company={{ ...company }} />
+              ))}
+              <h3>{"Ticker Symbol: " + earning.tickerSymbol}</h3>
+              <p>
+                <strong>Latest Earnings Transcript Summary:</strong>{" "}
+                {earning.earningsSummary}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }
