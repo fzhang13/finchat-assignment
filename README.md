@@ -47,7 +47,7 @@ Trying to build a smart summarizer that can take the user input and translate in
 
 ## Nice to haves/improvements
 
-- A better front end (componentized and modular)
+- A better front end (componentized and modular) + general code cleanup
 - Better error handling when company cannot be parsed in FMP (private companies)
 - Use a model that has more context into financially related stuff instead of a generic model
 - Fine tune models to be better suited for financial understanding
