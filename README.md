@@ -1,5 +1,11 @@
 ## Introduction
 
+
+
+https://github.com/user-attachments/assets/b37821e0-7555-454a-9c65-ae0c83d50a73
+
+
+
 This is a quick PoC to integrating OPENAI API as well as FMP APIs to summarize and retrieve the latest financial information/earnings about certain companies
 
 This application takes a standard prompt such as the following and will then query OPENAI API for the latest info regarding said query, as well as tapping into FMP's api to fetch the latest earnings based on the prompt provided (It will extra the ticker symbol of said company)
